@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Images (descomenta si no quieres versionar las imágenes)
+# imgs/*.jpg
+# imgs/*.jpeg
+# imgs/*.png
+# imgs/*.bmp
+
+# Resultados y outputs
+resultados/
+outputs/
+*.png
+*.jpg
+*.jpeg
+
+# Sistema operativo
+Thumbs.db
+.DS_Store
+desktop.ini
+
+# Matplotlib
+*.pdf
+*.eps
+
+# Logs
+*.log
+
+# Archivos temporales
+*.tmp
+*.temp

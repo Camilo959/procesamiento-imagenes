@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from utils.conversiones_color import rgb_a_yuv, rgb_a_hsv
+from utils.conversiones_color import rgb_a_yuv
 
 # Ruta de la imagen
-ruta_imagen = "./imgs/1005.jpg"
+ruta_imagen = "./imgs/1000.jpg"
 
 # Abrir la imagen con PIL
 imagen = Image.open(ruta_imagen)
@@ -14,19 +14,21 @@ datos_numericos_de_imagen = np.asarray(imagen)
 
 # --- Convertir a YUV ---
 imagen_yuv = rgb_a_yuv(datos_numericos_de_imagen)
-# --- Convertir a HSV ---
-imagen_hsv = rgb_a_hsv(datos_numericos_de_imagen)
 
-# --- Mostrar solo el canal H ---
-plt.imshow(imagen_hsv[:, :, 0], cmap='gray')
-plt.title("Canal H (Hue)")
-#plt.axis('off')
+# =================================================================
+# CONCLUSIÓN: Se seleccionó el canal Y del espacio YUV
+# Razón: Representa la luminancia y permite separar insectos oscuros
+# del fondo brillante de la trampa amarilla
+# =================================================================
+
+# Extraer canal Y (luminancia)
+canal_y = imagen_yuv[:, :, 0]
+
+# Mostrar canal Y
+plt.figure(figsize=(10, 8))
+plt.imshow(canal_y, cmap='gray')
+plt.title("Canal Y (Luminancia) - Espacio de Color YUV", fontsize=14, fontweight='bold')
+plt.colorbar(label='Intensidad')
+plt.axis('off')
+plt.tight_layout()
 plt.show()
-"""
-# Dependiendo de la implementación, el canal Y puede estar 
-# en la primera posición (índice 0 para Y) o en la segunda posición 
-# (índice 1 para U) o en la tercera posición (índice 2 para V).
-plt.imshow(imagen_yuv[:, :, 0], cmap='gray')
-plt.title("Canal Y (luminancia)")
-#plt.axis('off')
-plt.show()"""
