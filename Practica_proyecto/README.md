@@ -69,7 +69,7 @@ Estas son las notas para la elección del espacio de color que se va a usar para
 - Del espacio de color YUV, el canal Y (luminancia) es el mas adecuado para tener en consideración, ya que es el que aporta la información de brillo, mientras que los canales U y V aportan información de color que no es relevante para la descripción del problema.
 - Del espacio de color HSV, el canal V (valor) es el mas adecuado para tener en consideración, ya que es el que aporta la información de brillo, mientras que los canales H y S aportan información de color que no es relevante para la descripción del problema.
 
-Se evaluaron los espacios de color RGB, YUV y HSV. Se determinó que la información relevante para la detección de insectos es el brillo, ya que los insectos presentan valores de intensidad muy bajos respecto al fondo amarillo de la trampa. Por esta razón se seleccionó el canal Y del espacio de color YUV, que representa la luminancia de la imagen y permite separar de forma clara los insectos oscuros del fondo brillante.
+Se evaluaron los espacios de color RGB, YUV y HSV para determinar cuál canal representaba mejor la diferencia entre los insectos y el fondo de la trampa amarilla. Aunque el canal Y del espacio YUV representa la luminancia perceptual, se observó que resalta con mayor intensidad pequeños residuos presentes en la superficie de la trampa. En contraste, el canal V del espacio HSV mostró una representación más limpia del contraste entre los insectos oscuros y el fondo brillante, reduciendo la visibilidad de dichos residuos. Por esta razón se seleccionó el canal V del espacio HSV como base para la detección.
 
 ## Requisitos
 
