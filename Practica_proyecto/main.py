@@ -1,16 +1,20 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
-from utils.conversiones_color import rgb_a_hsv
+from utils.conversiones_color import convolucion, rgb_a_hsv_only_value
 
 # Ruta de la imagen
-ruta_imagen = "./imgs/1005.jpg"
+ruta_imagen = "./imgs/1003.jpg"
 
 # Abrir la imagen con PIL
 imagen = Image.open(ruta_imagen)
 
 # Convertir la imagen a arreglo de numpy
 datos_numericos_de_imagen = np.asarray(imagen)
+
+kernel = [[1/9, 1/9, 1/9],
+          [1/9, 1/9, 1/9],
+          [1/9, 1/9, 1/9]]
 
 def calcular_histograma(imagen):
   histograma = []
@@ -22,7 +26,7 @@ def calcular_histograma(imagen):
   return histograma, xticks
 
 # --- Convertir a HSV ---
-imagen_hsv = rgb_a_hsv(datos_numericos_de_imagen)
+imagen_hsv = rgb_a_hsv_only_value(datos_numericos_de_imagen)
 
 # =================================================================
 # CONCLUSIÓN: Se seleccionó el canal V del espacio HSV
@@ -32,13 +36,32 @@ imagen_hsv = rgb_a_hsv(datos_numericos_de_imagen)
 # =================================================================
 
 # Extraer canal V (valor/brillo)
-canal_v = imagen_hsv[:, :, 2]
+canal_v = imagen_hsv[:, :]  # Canal V del espacio HSV para procesamiento
 canal_b = datos_numericos_de_imagen[:, :, 2]  # Canal B del espacio RGB para comparación
 
-# Mostrar histograma
-histograma_v, xticks_v = calcular_histograma(canal_v)
-plt.bar(xticks_v, histograma_v)
+imagen_filtrada = convolucion(canal_v, kernel)
+
+imagen_filtrada = np.array(imagen_filtrada)
+
+plt.figure(figsize=(12, 6))
+
+plt.subplot(1, 2, 1)
+plt.imshow(canal_v, cmap='gray')
+plt.title("Canal V (original)")
+plt.axis("off")
+
+plt.subplot(1, 2, 2)
+plt.imshow(imagen_filtrada, cmap='gray')
+plt.title("Canal V con filtro aplicado")
+plt.axis("off")
+
+plt.tight_layout()
 plt.show()
+
+# Mostrar histograma
+#histograma_v, xticks_v = calcular_histograma(canal_v)
+#plt.bar(xticks_v, histograma_v)
+#plt.show()
 
 #V = imagen_hsv[:, :, 2]
 #

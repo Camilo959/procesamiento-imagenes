@@ -48,3 +48,29 @@ def rgb_a_hsv(img):
 
     hsv = np.stack((H, S, V), axis=2)
     return hsv
+
+def rgb_a_hsv_only_value(img):
+    img = img.astype(float) / 255.0  # Normalizar a 0-1
+    R = img[..., 0]
+    G = img[..., 1]
+    B = img[..., 2]
+
+    Cmax = np.maximum(np.maximum(R, G), B)
+    return Cmax
+
+
+def convolucion(I, k):
+    I = np.array(I)
+    k = np.array(k)
+
+    m, n = I.shape
+    c, d = k.shape
+
+    salida = np.zeros((m-c+1, n-d+1))
+
+    for i in range(m-c+1):
+        for j in range(n-d+1):
+            region = I[i:i+c, j:j+d]
+            salida[i, j] = np.sum(region * k)
+
+    return salida
