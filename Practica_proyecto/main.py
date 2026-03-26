@@ -2,21 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import argparse
 from PIL import Image
-from utils.funciones import convolucion, rgb_a_hsv_solo_value, convolucion_separable, otsu, recortar_roi
-
-
-
-# Calcular el histograma de la imagen original 
-# solo para el canal V del espacio HSV
-def calcular_histograma(imagen):
-  if imagen.dtype == np.uint8:
-    imagen_u8 = imagen
-  else:
-    imagen_u8 = (np.clip(imagen, 0, 1) * 255).astype(np.uint8)
-
-  histograma = np.bincount(imagen_u8.ravel(), minlength=256).tolist()
-  xticks = list(range(256))
-  return histograma, xticks
+from utils.funciones import *
 
 
 def mostrar_comparacion_filtro(canal):
@@ -40,11 +26,31 @@ def mostrar_comparacion_filtro(canal):
 
 
 def mostrar_histograma(canal_v):
-  histograma_v, xticks_v = calcular_histograma(canal_v)
+  histograma_v, xticks_v = calcular_histograma_manual(canal_v)
   plt.bar(xticks_v, histograma_v)
   plt.title("Histograma del canal V (HSV)")
   plt.xlabel("Valor de brillo")
   plt.ylabel("Cantidad de pixeles")
+  plt.show()
+
+
+def mostrar_histograma_cdf(canal_v):
+  histograma_v, xticks_v = calcular_histograma(canal_v)
+  coordenadas, cdf_v = calcular_cdf(histograma_v)
+  plt.bar(coordenadas, cdf_v)
+  plt.title("CDF del canal V (HSV)")
+  plt.xlabel("Valor de brillo")
+  plt.ylabel("Cantidad acumulada de pixeles")
+  plt.show()
+
+
+def mostrar_imagen_ecualizada(canal_v):
+  histograma_v, xticks_v = calcular_histograma(canal_v)
+  cdf_v = calcular_cdf(histograma_v)[1]
+  canal_v_ecualizado = ecualizar_con_cdf(canal_v, cdf_v)
+  plt.imshow(canal_v_ecualizado, cmap='gray')
+  plt.title("Canal V ecualizado")
+  plt.axis("off")
   plt.show()
 
 
@@ -59,6 +65,9 @@ def mostrar_canal_v(canal_v):
 
 
 def mostrar_filtro_convolucion(canal_v):
+  kernel = [[1 / 9, 1 / 9, 1 / 9],
+          [1 / 9, 1 / 9, 1 / 9],
+          [1 / 9, 1 / 9, 1 / 9]]
   imagen_filtrada = convolucion_separable(canal_v, 1/9)
   plt.figure(figsize=(10, 8))
   plt.imshow(imagen_filtrada, cmap='gray')
@@ -98,7 +107,7 @@ def obtener_argumentos():
   )
   parser.add_argument(
       "--accion",
-      choices=["histograma", "comparar", "canal_v", "todo", "filtro_convolucion", "umbral_otsu", "binaria_181"],
+      choices=["histograma", "cdf", "ecualizada", "comparar", "canal_v", "todo", "filtro_convolucion", "umbral_otsu", "binaria_181"],
       default="histograma",
       help="Selecciona que salida mostrar"
   )
@@ -110,7 +119,7 @@ def main():
   args = obtener_argumentos()
 
     # Ruta de la imagen
-  ruta_imagen = "./imgs/1004.jpg"
+  ruta_imagen = "./imgs/papa.png"
 
   # Abrir la imagen con PIL
   imagen = Image.open(ruta_imagen)
@@ -126,7 +135,7 @@ def main():
           [1 / 9, 1 / 9, 1 / 9]]
 
 # --- Convertir a HSV ---
-  imagen_hsv_onyly_v = rgb_a_hsv_solo_value(imagen_recortada)
+  imagen_hsv_solo_canal_v = rgb_a_hsv_solo_value(imagen_recortada)
 
 # =================================================================
 # CONCLUSIÓN: Se seleccionó el canal V del espacio HSV
@@ -136,10 +145,14 @@ def main():
 # =================================================================
 
 # Extraer canal V (valor/brillo)
-  canal_v = imagen_hsv_onyly_v[:, :]  # Canal V del espacio HSV para procesamiento
+  canal_v = imagen_hsv_solo_canal_v[:, :]  # Canal V del espacio HSV para procesamiento
 
   if args.accion == "histograma":
     mostrar_histograma(canal_v)
+  elif args.accion == "cdf":
+    mostrar_histograma_cdf(canal_v)
+  elif args.accion == "ecualizada":
+    mostrar_imagen_ecualizada(canal_v)
   elif args.accion == "comparar":
     mostrar_comparacion_filtro(canal_v)
   elif args.accion == "canal_v":
@@ -157,9 +170,10 @@ def main():
     mostrar_binaria_umbral_181(canal_v)
 
 """
-Flujo de la aplicación
 python main.py
 python main.py --accion histograma
+python main.py --accion cdf
+python main.py --accion ecualizada
 python main.py --accion comparar
 python main.py --accion canal_v
 python main.py --accion todo

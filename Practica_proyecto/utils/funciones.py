@@ -49,6 +49,7 @@ def rgb_a_hsv(img):
     hsv = np.stack((H, S, V), axis=2)
     return hsv
 
+
 def rgb_a_hsv_solo_value(img):
     img = img.astype(float) / 255.0  # Normalizar a 0-1
     R = img[..., 0]
@@ -109,6 +110,27 @@ def calcular_histograma(imagen):
   return histograma, xticks
 
 
+def calcular_histograma_manual(imagen):
+    # Normalizar a 0-255 si es necesario
+    if imagen.dtype != np.uint8:
+        imagen = np.clip(imagen, 0, 1)
+        imagen = (imagen * 255).astype(np.uint8)
+
+    # Inicializar histograma en ceros
+    histograma = [0] * 256
+
+    # Recorrer cada píxel manualmente
+    alto, ancho = imagen.shape
+
+    for i in range(alto):
+        for j in range(ancho):
+            valor = imagen[i, j]
+            histograma[valor] += 1
+
+    xticks = list(range(256))
+    return histograma, xticks
+
+
 def otsu(imagen):
   histograma, _ = calcular_histograma(imagen)
 
@@ -144,6 +166,31 @@ def otsu(imagen):
 
     return valor_intensidad_de_la_maxima_varianza
 
+
+# Calcular la función de distribución acumulada (CDF) a partir del histograma
+# a nivel vertical son frecuencias acumuladas, a nivel horizontal son los valores de intensidad (0-255)
+def calcular_cdf(histograma):
+    cdf = []
+    coordenadas = []
+    acumulador = 0
+
+    total_pixeles = sum(histograma)
+
+    for i in range(len(histograma)):
+        acumulador += histograma[i]
+        coordenadas.append(i)
+        cdf.append((acumulador / total_pixeles) * 255)
+
+    return coordenadas, cdf
+
+
+def ecualizar_con_cdf(imagen, cdf):
+    imagen_ecualizada = imagen.copy()
+
+    for i in range(len(cdf)):
+        imagen_ecualizada[imagen == i] = int(cdf[i])
+
+    return imagen_ecualizada
 
 # Recorta la región de interés (ROI) de la imagen, 
 # eliminando las partes superior e inferior manualmente
